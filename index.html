@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Salário - Alto Alegre do Pindaré</title>
+<link rel="icon" href="https://simulador.batysta.com/img/logo.png" sizes="32x32" />
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Simulador de Salário">
+<link rel="apple-touch-icon" href="https://simulador.batysta.com/img/logo.png">
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Simulador%20de%20Sal%C3%A1rio%22,%22short_name%22:%22Simulador%20de%20Sal%C3%A1rio%22,%22display%22:%22standalone%22,%22start_url%22:%22.%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%232563eb%22,%22icons%22:[{%22src%22:%22https://simulador.batysta.com/img/logo.png%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]} ">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --bg: #f0fdfa;
+            --card-bg: #ffffff;
+            --text: #134e4a;
+            --border: #ccfbf1;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .calculator-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(15, 118, 110, 0.15);
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #57a39d;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            background-color: #fafafa;
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            background-color: #f0fdfa;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px dashed #99f6e4;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 10px;
+            accent-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            margin-top: 1.5rem;
+        }
+
+        button:hover {
+            background-color: #115e59;
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            background-color: #f0fdfa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
+        }
+        
+        .result-row.highlight-plus {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        /* Estilo para detalhar o IR */
+        .ir-details {
+            font-size: 0.85rem;
+            color: #6b7280;
+            padding-left: 10px;
+            border-left: 2px solid #e5e7eb;
+            margin: 5px 0 10px 0;
+        }
+
+        .result-row.total-bruto {
+            border-top: 1px solid #ccfbf1;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .result-row.total {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed #99f6e4;
+        }
+
+        .highlight-negative { color: #be123c; }
+        .highlight-discount { color: #059669; } /* Verde para desconto */
+        
+        .small-note {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+
+        /* Estilo do aviso de instalação iphone*/
+        #ios-install-prompt {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #ffffff;
+            color: #333;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 9999;
+            border: 1px solid #ddd;
+        }
+
+        #ios-install-prompt p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .share-icon {
+            width: 20px;
+            vertical-align: middle;
+        }
+
+        /* Dark Mode para o aviso */
+        @media (prefers-color-scheme: dark) {
+            #ios-install-prompt {
+                background: #1e293b;
+                color: #f1f5f9;
+                border-color: #334155;
+            }
+        }
+        /* Estilo do aviso de instalação iphone*/
+
+        /* Estilo do aviso de instalação para Android */
+        #android-install-prompt {
+            display: none; /* Fica escondido até que o navegador autorize a instalação */
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #ffffff;
+            color: #333;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 9999;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        #android-install-prompt button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            #android-install-prompt {
+                background: #1e293b;
+                color: #f1f5f9;
+                border-color: #334155;
+            }
+        }
+        /* Estilo do aviso de instalação para Android */
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <h1>
+<img src="https://simulador.batysta.com/img/logoaap.jpeg" width="350" >
+     </h1>
+     <h1>Simulador de Salário/IRRF (Regra 2026)</h1>
+
+        <p class="subtitle">Professores Alto Alegre do Pindaré</p>
+        
+        <div class="input-group">
+            <label for="base">Vencimento Base (R$)</label>
+            <input type="number" id="base" placeholder="Ex: 5001.00" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label for="tempo">Tempo de Serviço (Anos)</label>
+            <input type="number" id="tempo" placeholder="0" min="0">
+        </div>
+
+        <div class="input-group">
+            <label for="dependentes">Dependentes (IR)</label>
+            <input type="number" id="dependentes" placeholder="0" value="0" min="0">
+        </div>
+
+        <div class="input-group">
+            <div class="checkbox-group" onclick="toggleCheckbox()">
+                <input type="checkbox" id="sindicato">
+                <label for="sindicato">Filiado ao Simproesemma (1%)</label>
+            </div>
+        </div>
+
+        <button onclick="calcular()">Calcular Líquido</button>
+
+        <div id="resultado" class="result-box">
+            <div class="result-row">
+                <span>Vencimento Base</span>
+                <span id="res-base">R$ 0,00</span>
+            </div>
+            <div class="result-row highlight-plus">
+                <span>Anuênio <span id="res-pct-anuenio" class="small-note">(0%)</span></span>
+                <span id="res-val-anuenio">+ R$ 0,00</span>
+            </div>
+            
+            <div class="result-row total-bruto">
+                <span>Total Bruto</span>
+                <span id="res-bruto">R$ 0,00</span>
+            </div>
+
+            <div class="result-row highlight-negative">
+                <span>Previdência (14%)</span>
+                <span id="res-prev">- R$ 0,00</span>
+            </div>
+            
+            <div class="result-row highlight-negative" id="row-sindicato" style="display:none;">
+                <span>Simproesemma (1%)</span>
+                <span id="res-sindicato">- R$ 0,00</span>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <div class="result-row highlight-negative" style="margin-bottom: 2px;">
+                    <span>Imposto de Renda (Final)</span>
+                    <span id="res-ir">- R$ 0,00</span>
+                </div>
+                
+                <div id="box-detalhes-ir" class="ir-details" style="display:none;">
+                    <div class="result-row">
+                        <span>IR Padrão (Tabela)</span>
+                        <span id="res-ir-padrao">R$ 0,00</span>
+                    </div>
+                    <div class="result-row highlight-discount">
+                        <span>Bônus Regra 2026</span>
+                        <span id="res-bonus">- R$ 0,00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-row total">
+                <span>Salário Líquido</span>
+                <span id="res-liquido">R$ 0,00</span>
+            </div>
+        </div>
+    </div>
+
+        <div id="ios-install-prompt">
+            <p>Para instalar no seu iPhone:</p>
+            <p>1. Toque no ícone de <strong>Compartilhar</strong> <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Ei-share-apple.svg" class="share-icon"> abaixo.</p>
+            <p>2. Role para baixo e selecione <strong>"Adicionar à Tela de Início"</strong>.</p>
+            <button onclick="document.getElementById('ios-install-prompt').style.display='none'" style="background:#64748b; margin-top:5px; padding: 5px;">Fechar</button>
+        </div>
+
+        <div id="android-install-prompt">
+            <p>Deseja instalar o <strong>Simulador de Salário</strong> no seu celular?</p>
+            <button id="btn-install-android">Instalar Agora</button>
+            <button onclick="document.getElementById('android-install-prompt').style.display='none'" style="background:#64748b; margin-left:0px;">Depois</button>
+        </div>
+
+    <script>
+        function toggleCheckbox() {
+            const checkbox = document.getElementById('sindicato');
+            if(event.target !== checkbox) checkbox.checked = !checkbox.checked;
+        }
+
+        function calcular() {
+            // -- INPUTS --
+            const base = parseFloat(document.getElementById('base').value);
+            const anos = parseInt(document.getElementById('tempo').value) || 0;
+            const dependentes = parseInt(document.getElementById('dependentes').value) || 0;
+            const isSindicato = document.getElementById('sindicato').checked;
+
+            if (isNaN(base) || base <= 0) {
+                alert("Por favor, digite o Vencimento Base.");
+                return;
+            }
+
+            // 1. CÁLCULOS INICIAIS
+            const valorAnuenio = base * (anos / 100);
+            const bruto = base + valorAnuenio;
+            const previdencia = bruto * 0.14;
+            const valSindicato = isSindicato ? bruto * 0.01 : 0;
+
+            // 2. CÁLCULO IR (ETAPA 1: TABELA PADRÃO)
+            const deducaoDependente = 189.59;
+            const baseIR = bruto - previdencia - (dependentes * deducaoDependente);
+            
+            let irPadrao = 0;
+            if (baseIR <= 2428.80) irPadrao = 0;
+            else if (baseIR <= 2826.65) irPadrao = (baseIR * 0.075) - 182.16;
+            else if (baseIR <= 3751.05) irPadrao = (baseIR * 0.15) - 394.16;
+            else if (baseIR <= 4664.68) irPadrao = (baseIR * 0.225) - 675.49;
+            else irPadrao = (baseIR * 0.275) - 908.73;
+
+            if (irPadrao < 0) irPadrao = 0;
+
+            // 3. CÁLCULO IR (ETAPA 2: REGRA NOVA / FADE-OUT)
+            // A regra diz: Quem ganha até 5k é isento. Entre 5k e 7.35k tem desconto.
+            let descontoLei2026 = 0;
+            let irFinal = irPadrao;
+
+            if (bruto <= 5000) {
+                // Isenção total garantida por lei
+                descontoLei2026 = irPadrao;
+                irFinal = 0;
+            } else if (bruto <= 7350) {
+                // Fórmula de Redução: 978,62 - (0,133145 * BRUTO)
+                // Usamos o Math.max(0, ...) para garantir que o fator não seja negativo
+                let fatorReducao = Math.max(0, 978.62 - (0.133145 * bruto));
+                
+                // O desconto é limitado ao valor do imposto (não gera crédito negativo)
+                if (fatorReducao > irPadrao) {
+                    descontoLei2026 = irPadrao;
+                    irFinal = 0;
+                } else {
+                    descontoLei2026 = fatorReducao;
+                    irFinal = irPadrao - fatorReducao;
+                }
+            }
+
+            // 4. LÍQUIDO
+            const liquido = bruto - previdencia - valSindicato - irFinal;
+
+            // -- EXIBIÇÃO --
+            const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.getElementById('res-base').innerText = fmt.format(base);
+            document.getElementById('res-pct-anuenio').innerText = `(${anos}%)`;
+            document.getElementById('res-val-anuenio').innerText = "+ " + fmt.format(valorAnuenio);
+            document.getElementById('res-bruto').innerText = fmt.format(bruto);
+            
+            document.getElementById('res-prev').innerText = "- " + fmt.format(previdencia);
+            
+            // Sindicato
+            const rowSindicato = document.getElementById('row-sindicato');
+            if (isSindicato) {
+                rowSindicato.style.display = 'flex';
+                document.getElementById('res-sindicato').innerText = "- " + fmt.format(valSindicato);
+            } else {
+                rowSindicato.style.display = 'none';
+            }
+
+            // IRRF Final e Detalhes
+            document.getElementById('res-ir').innerText = "- " + fmt.format(irFinal);
+            
+            const boxDetalhes = document.getElementById('box-detalhes-ir');
+            // Só mostra detalhes se houve alguma redução significativa da nova lei
+            if (bruto <= 7350 && descontoLei2026 > 0 && irPadrao > 0) {
+                boxDetalhes.style.display = 'block';
+                document.getElementById('res-ir-padrao').innerText = fmt.format(irPadrao);
+                document.getElementById('res-bonus').innerText = "- " + fmt.format(descontoLei2026);
+            } else {
+                boxDetalhes.style.display = 'none';
+            }
+
+            document.getElementById('res-liquido').innerText = fmt.format(liquido);
+            document.getElementById('resultado').style.display = 'block';
+        }
+    </script>
+
+    <script>
+  // Registro do Service Worker via Blob para manter arquivo único
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      const swCode = `
+        self.addEventListener('install', (e) => self.skipWaiting());
+        self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
+      `;
+      const blob = new Blob([swCode], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url).catch(err => console.log('SW Erro:', err));
+    });
+  }
+</script>
+
+<script>
+// pop instalação android
+// Detecta se é iOS e se NÃO está no modo "standalone" (instalado)
+const isIos = () => {
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(userAgent);
+}
+
+const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
+// Se for iOS e não estiver instalado, mostra o alerta
+if (isIos() && !isInStandaloneMode()) {
+  document.getElementById('ios-install-prompt').style.display = 'block';
+}
+</script>
+
+<script>
+    // pop instalação android
+let deferredPrompt;
+const androidPrompt = document.getElementById('android-install-prompt');
+const btnInstallAndroid = document.getElementById('btn-install-android');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Impede que o Chrome mostre o banner automático padrão
+  e.preventDefault();
+  // Guarda o evento para ser disparado quando o usuário clicar no seu botão
+  deferredPrompt = e;
+  // Mostra o seu aviso personalizado
+  androidPrompt.style.display = 'block';
+});
+
+btnInstallAndroid.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    // Mostra o prompt de instalação do sistema
+    deferredPrompt.prompt();
+    // Aguarda a escolha do usuário
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`Usuário escolheu: ${outcome}`);
+    // Limpa o prompt
+    deferredPrompt = null;
+    // Esconde o seu aviso
+    androidPrompt.style.display = 'none';
+  }
+});
+
+// Esconde o aviso se o app já estiver instalado
+window.addEventListener('appinstalled', () => {
+  androidPrompt.style.display = 'none';
+  console.log('PWA instalado com sucesso!');
+});
+</script>
+
+</body>
+</html>
