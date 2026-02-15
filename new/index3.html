@@ -426,8 +426,9 @@
         const dismissInstallBtn = document.getElementById('dismissInstallBtn');
         const installMessage = document.getElementById('installMessage');
         const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        const isAndroid = /android/i.test(navigator.userAgent);
+        const isDesktop = !isIos && !isAndroid;
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        const installDismissed = localStorage.getItem('installBannerDismissed') === '1';
 
         // Manifest embutido no próprio HTML
         (function injectInlineManifest() {
@@ -465,25 +466,51 @@
         })();
 
         function showInstallBanner() {
-            if (!isStandalone && !installDismissed) {
+            if (!isStandalone) {
                 installBanner.style.display = 'block';
             }
         }
 
-        function hideInstallBanner(persist) {
+        function hideInstallBanner() {
             installBanner.style.display = 'none';
-            if (persist) {
-                localStorage.setItem('installBannerDismissed', '1');
-            }
         }
 
-        if (isIos && !isStandalone) {
-            installMessage.textContent = "Deseja instalar este app? No iPhone/iPad, toque em Compartilhar e depois em 'Adicionar à Tela de Início'.";
-            installBtn.textContent = "Como instalar";
-            showInstallBanner();
-        } else {
-            showInstallBanner();
+        function getDesktopInstallHint() {
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.includes('edg/')) {
+                return "No Edge (desktop): menu (⋯) > Apps > Instalar este site como aplicativo.";
+            }
+            if (ua.includes('chrome/')) {
+                return "No Chrome (desktop): ícone de instalar na barra de endereço ou menu (⋮) > Instalar aplicativo.";
+            }
+            if (ua.includes('safari/')) {
+                return "No Safari (macOS): menu Arquivo > Adicionar ao Dock.";
+            }
+            if (ua.includes('firefox/')) {
+                return "No Firefox, a instalação como app pode não estar disponível. Use Chrome, Edge ou Safari para instalar.";
+            }
+            return "No navegador, procure a opção de instalar app no menu principal.";
         }
+
+        function configureInstallBannerByPlatform() {
+            if (isIos) {
+                installMessage.textContent = "Deseja instalar este app? No iPhone/iPad, toque em Compartilhar e depois em 'Adicionar à Tela de Início'.";
+                installBtn.textContent = "Como instalar";
+                return;
+            }
+
+            if (isDesktop) {
+                installMessage.textContent = "Deseja instalar este app no computador? " + getDesktopInstallHint();
+                installBtn.textContent = "Instalar app";
+                return;
+            }
+
+            installMessage.textContent = "Deseja instalar este app no seu celular Android?";
+            installBtn.textContent = "Instalar";
+        }
+
+        configureInstallBannerByPlatform();
+        showInstallBanner();
 
         window.addEventListener('beforeinstallprompt', (event) => {
             event.preventDefault();
@@ -498,22 +525,22 @@
             }
 
             if (!deferredPrompt) {
-                alert("A opção de instalação ficará disponível após alguns segundos de uso (em HTTPS).");
+                alert(getDesktopInstallHint());
                 return;
             }
 
             deferredPrompt.prompt();
             await deferredPrompt.userChoice;
             deferredPrompt = null;
-            hideInstallBanner(true);
+            hideInstallBanner();
         });
 
         dismissInstallBtn.addEventListener('click', () => {
-            hideInstallBanner(true);
+            hideInstallBanner();
         });
 
         window.addEventListener('appinstalled', () => {
-            hideInstallBanner(true);
+            hideInstallBanner();
         });
 
         // Service Worker embutido no próprio HTML
