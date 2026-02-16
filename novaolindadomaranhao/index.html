@@ -484,6 +484,8 @@
 <script>
 // popup instalação android
 // Detecta se é iOS e se NÃO está no modo "standalone" (instalado)
+const INSTALL_PROMPT_AUTO_CLOSE_MS = 5000;
+
 const isIos = () => {
   const userAgent = window.navigator.userAgent.toLowerCase();
   return /iphone|ipad|ipod/.test(userAgent);
@@ -493,7 +495,11 @@ const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.n
 
 // Se for iOS e não estiver instalado, mostra o alerta
 if (isIos() && !isInStandaloneMode()) {
-  document.getElementById('ios-install-prompt').style.display = 'block';
+  const iosPrompt = document.getElementById('ios-install-prompt');
+  iosPrompt.style.display = 'block';
+  setTimeout(() => {
+    iosPrompt.style.display = 'none';
+  }, INSTALL_PROMPT_AUTO_CLOSE_MS);
 }
 </script>
 
@@ -510,6 +516,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
   deferredPrompt = e;
   // Mostra o seu aviso personalizado
   androidPrompt.style.display = 'block';
+  setTimeout(() => {
+    androidPrompt.style.display = 'none';
+  }, INSTALL_PROMPT_AUTO_CLOSE_MS);
 });
 
 btnInstallAndroid.addEventListener('click', async () => {
