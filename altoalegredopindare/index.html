@@ -256,8 +256,8 @@
         </div>
 
         <div class="input-group">
-            <label for="quinquenios">Qtd de Quinquênios (5% cada)</label>
-            <input type="number" id="quinquenios" placeholder="Ex: 2" min="0">
+            <label for="anuenios">Anuênios (1% cada)</label>
+            <input type="number" id="anuenios" placeholder="Ex: 2" min="0">
         </div>
 
         <div class="input-group">
@@ -294,8 +294,8 @@
                 <span id="res-base"></span>
             </div>
             <div class="result-row highlight-plus">
-                <span>Quinquênio(s):</span>
-                <span id="res-quinquenio"></span>
+                <span>Anuênio(s):</span>
+                <span id="res-anuenio"></span>
             </div>
             <div id="row-formacao" class="result-row highlight-plus" style="display: none;">
                 <span>Formação Continuada (5%):</span>
@@ -361,7 +361,7 @@
     <script>
         function calcular() {
             const base = parseFloat(document.getElementById('salarioBase').value) || 0;
-            const qtdQuinquenios = parseInt(document.getElementById('quinquenios').value) || 0;
+            const qtdAnuenios = parseInt(document.getElementById('anuenios').value) || 0;
             const numDep = parseInt(document.getElementById('dependentes').value) || 0;
             const isFormacao = document.getElementById('formacao').checked;
             const isFormacao10 = document.getElementById('formacao10').checked;
@@ -370,10 +370,10 @@
             if (base <= 0) return alert("Por favor, insira o vencimento base.");
 
             // 1. Acréscimos (calculados sobre o salário base)
-            const valorQuinquenio = base * (qtdQuinquenios * 0.05);
+            const valorAnuenio = base * (qtdAnuenios * 0.01);
             const valorFormacao = isFormacao ? base * 0.05 : 0;
             const valorFormacao10 = isFormacao10 ? base * 0.10 : 0;
-            const bruto = base + valorQuinquenio + valorFormacao + valorFormacao10;
+            const bruto = base + valorAnuenio + valorFormacao + valorFormacao10;
 
             // 2. Descontos Previdência e Sindicato
             const previdencia = bruto * 0.14;
@@ -421,7 +421,7 @@
             const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
             
             document.getElementById('res-base').innerText = fmt.format(base);
-            document.getElementById('res-quinquenio').innerText = "+ " + fmt.format(valorQuinquenio);
+            document.getElementById('res-anuenio').innerText = "+ " + fmt.format(valorAnuenio);
             
             const rowFormacao = document.getElementById('row-formacao');
             if(isFormacao) {
