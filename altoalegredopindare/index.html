@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador Salarial - Alto Alegre do Pindaré - MA</title>
 
-<link rel="icon" href="https://simulador.batysta.com/img/logo.png" sizes="32x32" />
+<link rel="icon" href="img/logo.png" sizes="32x32" />
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Simulador Salarial">
-<link rel="apple-touch-icon" href="https://simulador.batysta.com/img/logo.png">
-<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Simulador%20Salarial%22,%22short_name%22:%22Simulador%20Salarial%22,%22display%22:%22standalone%22,%22start_url%22:%22.%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%232563eb%22,%22icons%22:[{%22src%22:%22https://simulador.batysta.com/altoalegredopindare/img/sinpro192.png%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]} ">
+<link rel="apple-touch-icon" href="img/sinpro192.png">
+<link rel="manifest" href="manifest.webmanifest">
 
     <style>
         :root {
@@ -467,16 +467,9 @@
     </script>
 
 <script>
-  // Registro do Service Worker via Blob para manter arquivo único
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      const swCode = `
-        self.addEventListener('install', (e) => self.skipWaiting());
-        self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
-      `;
-      const blob = new Blob([swCode], { type: 'text/javascript' });
-      const url = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(url).catch(err => console.log('SW Erro:', err));
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Erro:', err));
     });
   }
 </script>
@@ -544,7 +537,3 @@ window.addEventListener('appinstalled', () => {
 
 </body>
 </html>
-
-
-
-
