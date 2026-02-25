@@ -484,11 +484,7 @@ const isIos = () => {
   return /iphone|ipad|ipod/.test(userAgent);
 }
 
-const isInStandaloneMode = () => {
-  const isIosStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
-  const isDisplayStandalone = window.matchMedia('(display-mode: standalone)').matches;
-  return isIosStandalone || isDisplayStandalone;
-};
+const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
 // Se for iOS e não estiver instalado, mostra o alerta
 if (isIos() && !isInStandaloneMode()) {
@@ -505,13 +501,10 @@ if (isIos() && !isInStandaloneMode()) {
 let deferredPrompt;
 const androidPrompt = document.getElementById('android-install-prompt');
 const btnInstallAndroid = document.getElementById('btn-install-android');
-const isAndroid = /android/i.test(window.navigator.userAgent);
 
 window.addEventListener('beforeinstallprompt', (e) => {
   // Impede que o Chrome mostre o banner automático padrão
   e.preventDefault();
-  // Bloqueia desktop e outras plataformas; este popup é apenas para Android
-  if (!isAndroid || isInStandaloneMode()) return;
   // Guarda o evento para ser disparado quando o usuário clicar no seu botão
   deferredPrompt = e;
   // Mostra o seu aviso personalizado
