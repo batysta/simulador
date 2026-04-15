@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Salarial - Alto Alegre do Pindaré - MA</title>
+    <title>Simulador Salarial - Cachoeira Grande - MA</title>
 
 <link rel="icon" href="img/logo.png" sizes="32x32" />
 
@@ -246,9 +246,9 @@
 
     <div class="calculator-card">
                 <h1>
-<img src="https://simulador.batysta.com/altoalegredopindare/img/logoaap.jpg" width="350" ></h1>
+<img src="img/cachoeiragrande.jpg" width="350" ></h1>
         <h1>Simulador Salarial<br>(IRRF Regra 2026)</h1>
-        <p class="subtitle">Professores | Alto Alegre do Pindaré - MA</p>
+        <p class="subtitle">Professores | Cachoeira Grande - MA</p>
 
         <div class="input-group">
             <label for="salarioBase">Vencimento Base (R$)</label>
@@ -257,26 +257,12 @@
 
         <div class="input-group">
             <label for="anuenios">Anuênios (1% cada)</label>
-            <input type="number" id="anuenios" placeholder="Ex: 2" min="0">
+            <input type="number" id="anuenios" placeholder="Ex: 5" min="0">
         </div>
 
         <div class="input-group">
             <label for="dependentes">Nº de Dependentes</label>
-            <input type="number" id="dependentes" value="0" min="0">
-        </div>
-
-        <div class="input-group">
-            <div class="checkbox-group" onclick="document.getElementById('formacao').click()">
-                <input type="checkbox" id="formacao" onclick="event.stopPropagation()">
-                <label style="margin-bottom: 0; cursor: pointer;">Formação Continuada (5%)</label>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <div class="checkbox-group" onclick="document.getElementById('formacao10').click()">
-                <input type="checkbox" id="formacao10" onclick="event.stopPropagation()">
-                <label style="margin-bottom: 0; cursor: pointer;">Formação Continuada (10%)</label>
-            </div>
+            <input type="number" id="dependentes" placeholder="Ex: 2" min="0">
         </div>
 
         <div class="input-group">
@@ -297,20 +283,12 @@
                 <span>Anuênio(s):</span>
                 <span id="res-anuenio"></span>
             </div>
-            <div id="row-formacao" class="result-row highlight-plus" style="display: none;">
-                <span>Formação Continuada (5%):</span>
-                <span id="res-formacao"></span>
-            </div>
-            <div id="row-formacao10" class="result-row highlight-plus" style="display: none;">
-                <span>Formação Continuada (10%):</span>
-                <span id="res-formacao10"></span>
-            </div>
             <div class="result-row total-bruto">
                 <span>Total Bruto:</span>
                 <span id="res-bruto"></span>
             </div>
             <div class="result-row highlight-negative">
-                <span>Previdência (14%):</span>
+                <span>Previdência (9,4%):</span>
                 <span id="res-prev"></span>
             </div>
             <div id="row-sindicato" class="result-row highlight-negative" style="display: none;">
@@ -363,21 +341,17 @@
             const base = parseFloat(document.getElementById('salarioBase').value) || 0;
             const qtdAnuenios = parseInt(document.getElementById('anuenios').value) || 0;
             const numDep = parseInt(document.getElementById('dependentes').value) || 0;
-            const isFormacao = document.getElementById('formacao').checked;
-            const isFormacao10 = document.getElementById('formacao10').checked;
             const isSindicato = document.getElementById('sindicato').checked;
 
             if (base <= 0) return alert("Por favor, insira o vencimento base.");
 
             // 1. Acréscimos (calculados sobre o salário base)
             const valorAnuenio = base * (qtdAnuenios * 0.01);
-            const valorFormacao = isFormacao ? base * 0.05 : 0;
-            const valorFormacao10 = isFormacao10 ? base * 0.10 : 0;
-            const bruto = base + valorAnuenio + valorFormacao + valorFormacao10;
+            const bruto = base + valorAnuenio;
 
             // 2. Descontos Previdência e Sindicato
-            const previdencia = bruto * 0.14;
-            const sindicato = isSindicato ? bruto * 0.01 : 0;
+            const previdencia = bruto * 0.094;
+            const sindicato = isSindicato ? base * 0.01 : 0;
 
             // 3. Cálculo IRRF Padrão (Tabela Atualizada + Dependentes)
             let baseIRRF = bruto - previdencia - (numDep * 189.59);
@@ -422,22 +396,6 @@
             
             document.getElementById('res-base').innerText = fmt.format(base);
             document.getElementById('res-anuenio').innerText = "+ " + fmt.format(valorAnuenio);
-            
-            const rowFormacao = document.getElementById('row-formacao');
-            if(isFormacao) {
-                rowFormacao.style.display = 'flex';
-                document.getElementById('res-formacao').innerText = "+ " + fmt.format(valorFormacao);
-            } else {
-                rowFormacao.style.display = 'none';
-            }
-
-            const rowFormacao10 = document.getElementById('row-formacao10');
-            if(isFormacao10) {
-                rowFormacao10.style.display = 'flex';
-                document.getElementById('res-formacao10').innerText = "+ " + fmt.format(valorFormacao10);
-            } else {
-                rowFormacao10.style.display = 'none';
-            }
 
             document.getElementById('res-bruto').innerText = fmt.format(bruto);
             document.getElementById('res-prev').innerText = "- " + fmt.format(previdencia);
@@ -484,7 +442,11 @@ const isIos = () => {
   return /iphone|ipad|ipod/.test(userAgent);
 }
 
-const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+const isInStandaloneMode = () => {
+  const isIosStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
+  const isDisplayStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  return isIosStandalone || isDisplayStandalone;
+};
 
 // Se for iOS e não estiver instalado, mostra o alerta
 if (isIos() && !isInStandaloneMode()) {
@@ -501,10 +463,13 @@ if (isIos() && !isInStandaloneMode()) {
 let deferredPrompt;
 const androidPrompt = document.getElementById('android-install-prompt');
 const btnInstallAndroid = document.getElementById('btn-install-android');
+const isAndroid = /android/i.test(window.navigator.userAgent);
 
 window.addEventListener('beforeinstallprompt', (e) => {
   // Impede que o Chrome mostre o banner automático padrão
   e.preventDefault();
+  // Bloqueia desktop e outras plataformas; este popup é apenas para Android
+  if (!isAndroid || isInStandaloneMode()) return;
   // Guarda o evento para ser disparado quando o usuário clicar no seu botão
   deferredPrompt = e;
   // Mostra o seu aviso personalizado
