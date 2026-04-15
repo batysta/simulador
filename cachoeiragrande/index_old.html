@@ -84,15 +84,6 @@
             margin-bottom: 1rem;
         }
 
-        .section-heading {
-            margin: 1.25rem 0 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border);
-            color: var(--primary);
-            font-size: 0.95rem;
-            font-weight: 700;
-        }
-
         label {
             display: block;
             margin-bottom: 0.4rem;
@@ -274,18 +265,6 @@
             <input type="number" id="dependentes" placeholder="Ex: 2" min="0">
         </div>
 
-        <div class="section-heading">Gratificações e Descontos</div>
-
-        <div class="input-group">
-            <label for="gratificacoes">Gratificações (R$)</label>
-            <input type="number" id="gratificacoes" placeholder="Ex: 450,00" min="0" step="0.01">
-        </div>
-
-        <div class="input-group">
-            <label for="descontosExtras">Descontos Extras (R$)</label>
-            <input type="number" id="descontosExtras" placeholder="Ex: 120,00" min="0" step="0.01">
-        </div>
-
         <div class="input-group">
             <div class="checkbox-group" onclick="document.getElementById('sindicato').click()">
                 <input type="checkbox" id="sindicato" onclick="event.stopPropagation()">
@@ -304,10 +283,6 @@
                 <span>Anuênio(s):</span>
                 <span id="res-anuenio"></span>
             </div>
-            <div id="row-gratificacoes" class="result-row highlight-plus" style="display: none;">
-                <span>Gratificações:</span>
-                <span id="res-gratificacoes"></span>
-            </div>
             <div class="result-row total-bruto">
                 <span>Total Bruto:</span>
                 <span id="res-bruto"></span>
@@ -319,10 +294,6 @@
             <div id="row-sindicato" class="result-row highlight-negative" style="display: none;">
                 <span>Sindicato (1%):</span>
                 <span id="res-sindicato"></span>
-            </div>
-            <div id="row-descontos-extras" class="result-row highlight-negative" style="display: none;">
-                <span>Descontos Extras:</span>
-                <span id="res-descontos-extras"></span>
             </div>
             
             <div id="box-detalhes-ir" style="display: none;">
@@ -370,15 +341,13 @@
             const base = parseFloat(document.getElementById('salarioBase').value) || 0;
             const qtdAnuenios = parseInt(document.getElementById('anuenios').value) || 0;
             const numDep = parseInt(document.getElementById('dependentes').value) || 0;
-            const gratificacoes = Math.max(0, parseFloat(document.getElementById('gratificacoes').value) || 0);
-            const descontosExtras = Math.max(0, parseFloat(document.getElementById('descontosExtras').value) || 0);
             const isSindicato = document.getElementById('sindicato').checked;
 
             if (base <= 0) return alert("Por favor, insira o vencimento base.");
 
             // 1. Acréscimos (calculados sobre o salário base)
             const valorAnuenio = base * (qtdAnuenios * 0.01);
-            const bruto = base + valorAnuenio + gratificacoes;
+            const bruto = base + valorAnuenio;
 
             // 2. Descontos Previdência e Sindicato
             const previdencia = bruto * 0.094;
@@ -420,21 +389,13 @@
                 irFinal = irPadrao;
             }
 
-            const liquido = bruto - previdencia - sindicato - descontosExtras - irFinal;
+            const liquido = bruto - previdencia - sindicato - irFinal;
 
             // Formatação e Exibição
             const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
             
             document.getElementById('res-base').innerText = fmt.format(base);
             document.getElementById('res-anuenio').innerText = "+ " + fmt.format(valorAnuenio);
-
-            const rowGratificacoes = document.getElementById('row-gratificacoes');
-            if (gratificacoes > 0) {
-                rowGratificacoes.style.display = 'flex';
-                document.getElementById('res-gratificacoes').innerText = "+ " + fmt.format(gratificacoes);
-            } else {
-                rowGratificacoes.style.display = 'none';
-            }
 
             document.getElementById('res-bruto').innerText = fmt.format(bruto);
             document.getElementById('res-prev').innerText = "- " + fmt.format(previdencia);
@@ -445,14 +406,6 @@
                 document.getElementById('res-sindicato').innerText = "- " + fmt.format(sindicato);
             } else {
                 rowSindicato.style.display = 'none';
-            }
-
-            const rowDescontosExtras = document.getElementById('row-descontos-extras');
-            if (descontosExtras > 0) {
-                rowDescontosExtras.style.display = 'flex';
-                document.getElementById('res-descontos-extras').innerText = "- " + fmt.format(descontosExtras);
-            } else {
-                rowDescontosExtras.style.display = 'none';
             }
 
             // Exibição Detalhada do IRRF
