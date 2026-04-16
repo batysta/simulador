@@ -93,18 +93,6 @@
             font-weight: 700;
         }
 
-        .split-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.75rem;
-        }
-
-        @media (max-width: 480px) {
-            .split-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         label {
             display: block;
             margin-bottom: 0.4rem;
@@ -161,15 +149,6 @@
             background-color: #f0fdfa;
             border-radius: 8px;
             display: none;
-        }
-
-        .legal-note {
-            margin-top: 1rem;
-            padding-top: 0.9rem;
-            border-top: 1px solid #ccfbf1;
-            font-size: 0.82rem;
-            line-height: 1.5;
-            color: #4b5563;
         }
 
         .result-row {
@@ -297,26 +276,9 @@
 
         <div class="section-heading">Gratificações e Descontos</div>
 
-        <div class="split-grid">
-            <div class="input-group">
-                <label for="difSalarial">Dif. Salarial (R$)</label>
-                <input type="number" id="difSalarial" placeholder="Ex: 450,00" min="0" step="0.01">
-            </div>
-
-            <div class="input-group">
-                <label for="auxilioAlimentacao">Auxílio Alimentação (R$)</label>
-                <input type="number" id="auxilioAlimentacao" placeholder="Ex: 300,00" min="0" step="0.01">
-            </div>
-
-            <div class="input-group">
-                <label for="valeTransporte">Vale Transporte (R$)</label>
-                <input type="number" id="valeTransporte" placeholder="Ex: 120,00" min="0" step="0.01">
-            </div>
-
-            <div class="input-group">
-                <label for="outrasGratificacoes">Outras Gratificações (R$)</label>
-                <input type="number" id="outrasGratificacoes" placeholder="Ex: 180,00" min="0" step="0.01">
-            </div>
+        <div class="input-group">
+            <label for="gratificacoes">Gratificações (R$)</label>
+            <input type="number" id="gratificacoes" placeholder="Ex: 450,00" min="0" step="0.01">
         </div>
 
         <div class="input-group">
@@ -342,32 +304,16 @@
                 <span>Anuênio(s):</span>
                 <span id="res-anuenio"></span>
             </div>
-            <div id="row-dif-salarial" class="result-row highlight-plus" style="display: none;">
-                <span>Dif. Salarial:</span>
-                <span id="res-dif-salarial"></span>
-            </div>
-            <div id="row-auxilio-alimentacao" class="result-row highlight-plus" style="display: none;">
-                <span>Auxílio Alimentação:</span>
-                <span id="res-auxilio-alimentacao"></span>
-            </div>
-            <div id="row-vale-transporte" class="result-row highlight-plus" style="display: none;">
-                <span>Vale Transporte:</span>
-                <span id="res-vale-transporte"></span>
-            </div>
-            <div id="row-outras-gratificacoes" class="result-row highlight-plus" style="display: none;">
-                <span>Outras Gratificações:</span>
-                <span id="res-outras-gratificacoes"></span>
-            </div>
-            <div class="result-row">
-                <span>Base Previdência/IRRF:</span>
-                <span id="res-base-irrf"></span>
+            <div id="row-gratificacoes" class="result-row highlight-plus" style="display: none;">
+                <span>Gratificações:</span>
+                <span id="res-gratificacoes"></span>
             </div>
             <div class="result-row total-bruto">
                 <span>Total Bruto:</span>
                 <span id="res-bruto"></span>
             </div>
             <div class="result-row highlight-negative">
-                <span>Previdência (INSS/RGPS):</span>
+                <span>Previdência (9,4%):</span>
                 <span id="res-prev"></span>
             </div>
             <div id="row-sindicato" class="result-row highlight-negative" style="display: none;">
@@ -380,13 +326,13 @@
             </div>
             
             <div id="box-detalhes-ir" style="display: none;">
-                <div style="font-weight: bold; margin-bottom: 5px;">Detalhamento IRRF (Lei nº 15.270/2025):</div>
+                <div style="font-weight: bold; margin-bottom: 5px;">Detalhamento IRRF (Lei 2026):</div>
                 <div class="result-row" style="margin-bottom: 2px;">
                     <span>IRRF Padrão:</span>
                     <span id="res-ir-padrao"></span>
                 </div>
                 <div class="result-row" style="margin-bottom: 2px; color: #059669;">
-                    <span>Redução Lei nº 15.270/2025:</span>
+                    <span>Redução Lei 2026:</span>
                     <span id="res-bonus"></span>
                 </div>
             </div>
@@ -398,9 +344,6 @@
             <div class="result-row total">
                 <span>Líquido a Receber:</span>
                 <span id="res-liquido"></span>
-            </div>
-            <div class="legal-note">
-                Os cálculos previdenciários obedecem à Portaria Interministerial MPS/MF nº 13, de 9 de janeiro de 2026. A redução e isenção do IRRF obedecem à Lei nº 15.270, de 26 de novembro de 2025.
             </div>
         </div>
     </div>
@@ -423,33 +366,11 @@
         </div>
 
     <script>
-        function calcularPrevidenciaRgsp2026(salarioBruto) {
-            const tetoRgsp2026 = 8475.55;
-            const salarioContribuicao = Math.min(salarioBruto, tetoRgsp2026);
-
-            if (salarioContribuicao <= 1621.00) {
-                return salarioContribuicao * 0.075;
-            }
-
-            if (salarioContribuicao <= 2902.84) {
-                return (salarioContribuicao * 0.09) - 24.32;
-            }
-
-            if (salarioContribuicao <= 4354.27) {
-                return (salarioContribuicao * 0.12) - 111.40;
-            }
-
-            return (salarioContribuicao * 0.14) - 198.49;
-        }
-
         function calcular() {
             const base = parseFloat(document.getElementById('salarioBase').value) || 0;
             const qtdAnuenios = parseInt(document.getElementById('anuenios').value) || 0;
             const numDep = parseInt(document.getElementById('dependentes').value) || 0;
-            const difSalarial = Math.max(0, parseFloat(document.getElementById('difSalarial').value) || 0);
-            const auxilioAlimentacao = Math.max(0, parseFloat(document.getElementById('auxilioAlimentacao').value) || 0);
-            const valeTransporte = Math.max(0, parseFloat(document.getElementById('valeTransporte').value) || 0);
-            const outrasGratificacoes = Math.max(0, parseFloat(document.getElementById('outrasGratificacoes').value) || 0);
+            const gratificacoes = Math.max(0, parseFloat(document.getElementById('gratificacoes').value) || 0);
             const descontosExtras = Math.max(0, parseFloat(document.getElementById('descontosExtras').value) || 0);
             const isSindicato = document.getElementById('sindicato').checked;
 
@@ -457,16 +378,14 @@
 
             // 1. Acréscimos (calculados sobre o salário base)
             const valorAnuenio = base * (qtdAnuenios * 0.01);
-            const basePrevidenciaIrrf = base + valorAnuenio + difSalarial;
-            const adicionaisFinais = auxilioAlimentacao + valeTransporte + outrasGratificacoes;
-            const bruto = basePrevidenciaIrrf + adicionaisFinais;
+            const bruto = base + valorAnuenio + gratificacoes;
 
-            // 2. Descontos sobre a base previdenciária/IRRF
-            const previdencia = calcularPrevidenciaRgsp2026(basePrevidenciaIrrf);
+            // 2. Descontos Previdência e Sindicato
+            const previdencia = bruto * 0.094;
             const sindicato = isSindicato ? base * 0.01 : 0;
 
             // 3. Cálculo IRRF Padrão (Tabela Atualizada + Dependentes)
-            let baseIRRF = basePrevidenciaIrrf - previdencia - (numDep * 189.59);
+            let baseIRRF = bruto - previdencia - (numDep * 189.59);
             let irPadrao = 0;
             
             if (baseIRRF <= 2428.80) irPadrao = 0;
@@ -477,17 +396,17 @@
             
             irPadrao = Math.max(0, irPadrao);
 
-            // 4. Lógica da redução do IRRF (Lei nº 15.270/2025)
+            // 4. Lógica Lei 2026 (Exatamente como solicitada)
             let irFinal = 0;
             let descontoLei2026 = 0;
 
-            if (basePrevidenciaIrrf <= 5000) {
+            if (bruto <= 5000) {
                 // Isenção total garantida por lei
                 descontoLei2026 = irPadrao;
                 irFinal = 0;
-            } else if (basePrevidenciaIrrf <= 7350) {
-                // Fórmula de redução aplicada sobre a base previdenciária/IRRF
-                let fatorReducao = Math.max(0, 978.62 - (0.133145 * basePrevidenciaIrrf));
+            } else if (bruto <= 7350) {
+                // Fórmula de Redução: 978,62 - (0,133145 * BRUTO)
+                let fatorReducao = Math.max(0, 978.62 - (0.133145 * bruto));
                 
                 if (fatorReducao > irPadrao) {
                     descontoLei2026 = irPadrao;
@@ -508,38 +427,13 @@
             
             document.getElementById('res-base').innerText = fmt.format(base);
             document.getElementById('res-anuenio').innerText = "+ " + fmt.format(valorAnuenio);
-            document.getElementById('res-base-irrf').innerText = fmt.format(basePrevidenciaIrrf);
 
-            const rowDifSalarial = document.getElementById('row-dif-salarial');
-            if (difSalarial > 0) {
-                rowDifSalarial.style.display = 'flex';
-                document.getElementById('res-dif-salarial').innerText = "+ " + fmt.format(difSalarial);
+            const rowGratificacoes = document.getElementById('row-gratificacoes');
+            if (gratificacoes > 0) {
+                rowGratificacoes.style.display = 'flex';
+                document.getElementById('res-gratificacoes').innerText = "+ " + fmt.format(gratificacoes);
             } else {
-                rowDifSalarial.style.display = 'none';
-            }
-
-            const rowAuxilioAlimentacao = document.getElementById('row-auxilio-alimentacao');
-            if (auxilioAlimentacao > 0) {
-                rowAuxilioAlimentacao.style.display = 'flex';
-                document.getElementById('res-auxilio-alimentacao').innerText = "+ " + fmt.format(auxilioAlimentacao);
-            } else {
-                rowAuxilioAlimentacao.style.display = 'none';
-            }
-
-            const rowValeTransporte = document.getElementById('row-vale-transporte');
-            if (valeTransporte > 0) {
-                rowValeTransporte.style.display = 'flex';
-                document.getElementById('res-vale-transporte').innerText = "+ " + fmt.format(valeTransporte);
-            } else {
-                rowValeTransporte.style.display = 'none';
-            }
-
-            const rowOutrasGratificacoes = document.getElementById('row-outras-gratificacoes');
-            if (outrasGratificacoes > 0) {
-                rowOutrasGratificacoes.style.display = 'flex';
-                document.getElementById('res-outras-gratificacoes').innerText = "+ " + fmt.format(outrasGratificacoes);
-            } else {
-                rowOutrasGratificacoes.style.display = 'none';
+                rowGratificacoes.style.display = 'none';
             }
 
             document.getElementById('res-bruto').innerText = fmt.format(bruto);
