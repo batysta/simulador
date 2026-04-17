@@ -304,6 +304,11 @@
             </div>
 
             <div class="input-group">
+                <label for="auxilioAlimentacao">Auxílio Alimentação (R$)</label>
+                <input type="number" id="auxilioAlimentacao" placeholder="Ex: 300,00" min="0" step="0.01">
+            </div>
+
+            <div class="input-group">
                 <label for="valeTransporte">Vale Transporte (R$)</label>
                 <input type="number" id="valeTransporte" placeholder="Ex: 120,00" min="0" step="0.01">
             </div>
@@ -340,6 +345,10 @@
             <div id="row-dif-salarial" class="result-row highlight-plus" style="display: none;">
                 <span>Dif. Salarial:</span>
                 <span id="res-dif-salarial"></span>
+            </div>
+            <div id="row-auxilio-alimentacao" class="result-row highlight-plus" style="display: none;">
+                <span>Auxílio Alimentação:</span>
+                <span id="res-auxilio-alimentacao"></span>
             </div>
             <div id="row-vale-transporte" class="result-row highlight-plus" style="display: none;">
                 <span>Vale Transporte:</span>
@@ -438,6 +447,7 @@
             const qtdAnuenios = parseInt(document.getElementById('anuenios').value) || 0;
             const numDep = parseInt(document.getElementById('dependentes').value) || 0;
             const difSalarial = Math.max(0, parseFloat(document.getElementById('difSalarial').value) || 0);
+            const auxilioAlimentacao = Math.max(0, parseFloat(document.getElementById('auxilioAlimentacao').value) || 0);
             const valeTransporte = Math.max(0, parseFloat(document.getElementById('valeTransporte').value) || 0);
             const outrasGratificacoes = Math.max(0, parseFloat(document.getElementById('outrasGratificacoes').value) || 0);
             const descontosExtras = Math.max(0, parseFloat(document.getElementById('descontosExtras').value) || 0);
@@ -448,7 +458,7 @@
             // 1. Acréscimos (calculados sobre o salário base)
             const valorAnuenio = base * (qtdAnuenios * 0.01);
             const basePrevidenciaIrrf = base + valorAnuenio + difSalarial;
-            const adicionaisFinais = valeTransporte + outrasGratificacoes;
+            const adicionaisFinais = auxilioAlimentacao + valeTransporte + outrasGratificacoes;
             const bruto = basePrevidenciaIrrf + adicionaisFinais;
 
             // 2. Descontos sobre a base previdenciária/IRRF
@@ -506,6 +516,14 @@
                 document.getElementById('res-dif-salarial').innerText = "+ " + fmt.format(difSalarial);
             } else {
                 rowDifSalarial.style.display = 'none';
+            }
+
+            const rowAuxilioAlimentacao = document.getElementById('row-auxilio-alimentacao');
+            if (auxilioAlimentacao > 0) {
+                rowAuxilioAlimentacao.style.display = 'flex';
+                document.getElementById('res-auxilio-alimentacao').innerText = "+ " + fmt.format(auxilioAlimentacao);
+            } else {
+                rowAuxilioAlimentacao.style.display = 'none';
             }
 
             const rowValeTransporte = document.getElementById('row-vale-transporte');
